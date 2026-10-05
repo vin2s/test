@@ -37,8 +37,8 @@ EXTRA_URLS_FOR_26 = _load_json_list(URLS_26_PATH, [])
 # Создаём папку зеркала, если она не существует
 os.makedirs(GITHUBMIRROR_DIR, exist_ok=True)
 
-GITHUB_TOKEN = os.environ.get("MY_TOKEN")
-REPO_NAME = "AvenCores/goida-vpn-configs"
+GITHUB_TOKEN = os.environ.get("MY_TOKEN") or os.environ.get("GITHUB_TOKEN")
+REPO_NAME = "vin2s/test"
 
 EXTRA_URL_TIMEOUT = int(os.environ.get("EXTRA_URL_TIMEOUT", "6"))
 EXTRA_URL_MAX_ATTEMPTS = int(os.environ.get("EXTRA_URL_MAX_ATTEMPTS", "2"))

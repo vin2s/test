@@ -2,3 +2,5 @@
 source/__pycache__/
 source/src/__pycache__/
 source/githubmirror/
+githubmirror/*
+!githubmirror/26.txt

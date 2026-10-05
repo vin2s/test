@@ -8,10 +8,15 @@ from src.logger import log, offset
 def git_commit_and_push(dry_run: bool = False):
     """Добавляет изменённые файлы в индекс, делает коммит и пушит."""
     try:
+        paths_to_add = [
+            os.path.relpath(os.path.join(GITHUBMIRROR_DIR, "26.txt"), GIT_ROOT),
+            "26.txt",
+        ]
+        if os.path.exists(README_PATH):
+            paths_to_add.append(os.path.relpath(README_PATH, GIT_ROOT))
+
         subprocess.run(
-            ["git", "add",
-             os.path.relpath(GITHUBMIRROR_DIR, GIT_ROOT),
-             os.path.relpath(README_PATH, GIT_ROOT)],
+            ["git", "add", *paths_to_add],
             check=True,
             cwd=GIT_ROOT,
         )

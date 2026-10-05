@@ -2,7 +2,7 @@ import argparse
 import concurrent.futures
 import os
 import sys
-from src.config import URLS, DEFAULT_MAX_WORKERS
+from src.config import URLS, DEFAULT_MAX_WORKERS, README_PATH
 from src.logger import updated_files, _UPDATED_FILES_LOCK, LOGS_BY_FILE
 from src.file_manager import download_and_save, create_filtered_configs
 from src.release_fetcher import fetch_latest_release_links, fetch_vc_runtime_link
@@ -36,20 +36,17 @@ def main(dry_run: bool = False):
         with _UPDATED_FILES_LOCK:
             updated_files.add(26)
 
-    # Независимые сетевые запросы выполняем параллельно, чтобы не ждать
-    # их последовательно (release links, VC runtime, статистика репозитория).
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as net_pool:
-        f_releases = net_pool.submit(fetch_latest_release_links)
-        f_vc = net_pool.submit(fetch_vc_runtime_link)
-        f_stats = net_pool.submit(get_repo_stats)
-        release_links = f_releases.result()
-        vc_runtime_link = f_vc.result()
-        repo_stats = f_stats.result()
+    if os.path.exists(README_PATH):
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as net_pool:
+            f_releases = net_pool.submit(fetch_latest_release_links)
+            f_vc = net_pool.submit(fetch_vc_runtime_link)
+            f_stats = net_pool.submit(get_repo_stats)
+            release_links = f_releases.result()
+            vc_runtime_link = f_vc.result()
+            repo_stats = f_stats.result()
+        update_readme_download_links(release_links, vc_runtime_link)
+        update_readme_table(repo_stats=repo_stats)
 
-    # Обновляем ссылки на скачивание v2rayNG, Throne и Visual C++ Runtimes
-    update_readme_download_links(release_links, vc_runtime_link)
-
-    update_readme_table(repo_stats=repo_stats)
     git_commit_and_push(dry_run=dry_run)
 
     # Вывод логов

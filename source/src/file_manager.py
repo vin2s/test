@@ -8,6 +8,7 @@ from src.config import (
     URLS,
     LOCAL_PATHS,
     GITHUBMIRROR_DIR,
+    GIT_ROOT,
     SNI_DOMAINS_PATH,
     EXTRA_URLS_FOR_26,
     EXTRA_URL_TIMEOUT,
@@ -188,10 +189,14 @@ def create_filtered_configs() -> str:
             seen_hostport.add(key)
         unique_configs.append(c)
 
+    content_26 = "\n".join(unique_configs)
     local_path_26 = os.path.join(GITHUBMIRROR_DIR, "26.txt")
+    root_path_26 = os.path.join(GIT_ROOT, "26.txt")
     try:
         with open(local_path_26, "w", encoding="utf-8") as f:
-            f.write("\n".join(unique_configs))
+            f.write(content_26)
+        with open(root_path_26, "w", encoding="utf-8") as f:
+            f.write(content_26)
         log(f"📁 Создан файл 26.txt с {len(unique_configs)} конфигами")
     except Exception as e:
         log(f"⚠️ Ошибка при сохранении 26.txt: {e}")
