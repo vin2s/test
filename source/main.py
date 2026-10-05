@@ -32,7 +32,7 @@ def main(dry_run: bool = False):
 
     local_path_26 = create_filtered_configs()
     # Определяем, изменился ли 26-й файл
-    if os.path.exists(local_path_26):
+    if local_path_26 and os.path.exists(local_path_26):
         with _UPDATED_FILES_LOCK:
             updated_files.add(26)
 
