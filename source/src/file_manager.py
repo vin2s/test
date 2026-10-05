@@ -191,14 +191,9 @@ def create_filtered_configs() -> str:
 
     content_26 = f"# updated: {offset}\n" + "\n".join(unique_configs)
     local_path_26 = os.path.join(GITHUBMIRROR_DIR, "26.txt")
-    root_path_26 = os.path.join(GIT_ROOT, "26.txt")
     try:
         with open(local_path_26, "w", encoding="utf-8") as f:
-            f.write(content_26)
-        with open(root_path_26, "w", encoding="utf-8") as f:
             f.write(content_26)
         log(f"📁 Создан файл 26.txt с {len(unique_configs)} конфигами")
     except Exception as e:
         log(f"⚠️ Ошибка при сохранении 26.txt: {e}")
-
-    return local_path_26
