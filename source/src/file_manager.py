@@ -14,7 +14,7 @@ from src.config import (
     EXTRA_URL_TIMEOUT,
     EXTRA_URL_MAX_ATTEMPTS,
 )
-from src.logger import log
+from src.logger import log, offset
 from src.network import fetch_data, _format_fetch_error
 from src.parser import filter_insecure_configs
 
@@ -189,7 +189,7 @@ def create_filtered_configs() -> str:
             seen_hostport.add(key)
         unique_configs.append(c)
 
-    content_26 = "\n".join(unique_configs)
+    content_26 = f"# updated: {offset}\n" + "\n".join(unique_configs)
     local_path_26 = os.path.join(GITHUBMIRROR_DIR, "26.txt")
     root_path_26 = os.path.join(GIT_ROOT, "26.txt")
     try:

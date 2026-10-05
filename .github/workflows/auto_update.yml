@@ -2,7 +2,8 @@ name: Auto Update
 
 on:
   schedule:
-    - cron: "*/9 * * * *"
+    # Ежедневно в 00:00 UTC (03:00 МСК)
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -20,6 +21,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
+          token: ${{ secrets.MY_TOKEN || github.token }}
           fetch-depth: 1
 
       - name: Set up Python
@@ -34,7 +36,8 @@ jobs:
 
       - name: Run script
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MY_TOKEN: ${{ secrets.MY_TOKEN || github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
           GIT_AUTHOR_NAME: "github-actions[bot]"
           GIT_AUTHOR_EMAIL: "github-actions[bot]@users.noreply.github.com"
           GIT_COMMITTER_NAME: "github-actions[bot]"

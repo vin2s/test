@@ -5,42 +5,42 @@ from src.logger import log, offset
 
 # -------------------- GIT --------------------
 
+def _git(args: list[str], check: bool = True) -> subprocess.CompletedProcess:
+    return subprocess.run(args, check=check, cwd=GIT_ROOT)
+
+
 def git_commit_and_push(dry_run: bool = False):
-    """Добавляет изменённые файлы в индекс, делает коммит и пушит."""
+    """Принудительно добавляет 26.txt, делает коммит и пушит в GitHub."""
     try:
-        paths_to_add = [
-            os.path.relpath(os.path.join(GITHUBMIRROR_DIR, "26.txt"), GIT_ROOT),
-            "26.txt",
-        ]
+        mirror_26 = os.path.join(GITHUBMIRROR_DIR, "26.txt")
+        root_26 = os.path.join(GIT_ROOT, "26.txt")
+        paths_to_add: list[str] = []
+        for path in (mirror_26, root_26):
+            if os.path.exists(path):
+                rel = os.path.relpath(path, GIT_ROOT).replace("\\", "/")
+                paths_to_add.append(rel)
         if os.path.exists(README_PATH):
-            paths_to_add.append(os.path.relpath(README_PATH, GIT_ROOT))
+            paths_to_add.append(os.path.relpath(README_PATH, GIT_ROOT).replace("\\", "/"))
 
-        subprocess.run(
-            ["git", "add", *paths_to_add],
-            check=True,
-            cwd=GIT_ROOT,
-        )
+        if not paths_to_add:
+            log("⚠️ Файлы 26.txt не найдены — коммит пропущен")
+            return
 
-        diff = subprocess.run(
-            ["git", "diff", "--cached", "--quiet"],
-            cwd=GIT_ROOT,
-        )
+        _git(["git", "add", "-f", *paths_to_add])
+
+        diff = _git(["git", "diff", "--cached", "--quiet"], check=False)
         if diff.returncode == 0:
             log("ℹ️ Нет изменений для коммита")
             return
 
-        subprocess.run(
-            ["git", "commit", "-m", f"🚀 Автообновление репозитория: {offset}"],
-            check=True,
-            cwd=GIT_ROOT,
-        )
+        _git(["git", "commit", "-m", f"🚀 Автообновление репозитория: {offset}"])
         log("✅ Коммит создан")
 
         if dry_run:
             log("ℹ️ Dry-run: push пропущен")
             return
 
-        subprocess.run(["git", "push"], check=True, cwd=GIT_ROOT)
+        _git(["git", "push", "origin", "HEAD"])
         log("✅ Изменения запушены в репозиторий")
 
     except subprocess.CalledProcessError as e:
